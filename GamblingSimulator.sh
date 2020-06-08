@@ -5,6 +5,8 @@ totalWin=0
 totalLoss=0
 numOfDays=30
 totalWinOrloss=0
+maximumWinAmount=0
+maximumLooseAmount=1500
 
 declare -A winningDays
 declare -A loosingDays
@@ -30,13 +32,36 @@ do
 		((totalLoss++))
 		totalWinOrloss=$(( $totalWinOrloss-50 ))
 		loosingDays["Day"$day]=$totalWinOrloss
-
+		if [ $maximumLooseAmount -gt $totalWinOrloss ]
+		then
+			maximumLooseAmount=$totalWinOrloss
+		fi
 	else
 		((totalWin++))
         	totalWinOrloss=$(( $totalWinOrloss+50 ))
 		winningDays["Day"$day]=$totalWinOrloss
+		if [ $maximumWinAmount -lt $totalWinOrloss ]
+		then
+			maximumWinAmount=$totalWinOrloss
+		fi
 	fi
         done
 echo "winningDays: ${!winningDays[@]}"
 echo "lossingDays: ${!loosingDays[@]}"
+echo "Luckiest Days:"
+for keys in ${!winningDays[@]}
+do
+	if [ ${winningDays[$keys]} -eq $maximumWinAmount ]
+	then
+		echo $keys
+	fi
+done
+echo "Unluckiest Days:"
+for keys in ${!loosingDays[@]}
+do
+	if [ ${loosingDays[$keys]} -eq $maximumLooseAmount ]
+	then
+		echo $keys
+	fi
+done
 echo "net winning= $totalWinOrloss number Of Loss Days= $totalLoss number of win Days= $totalWin"
